@@ -22,3 +22,6 @@ tasks
 
 # production build
 /releases
+/parts
+/prime
+*.snap

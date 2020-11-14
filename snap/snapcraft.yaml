@@ -1,0 +1,25 @@
+name: tasks
+base: core18 # the base snap is the execution environment for this snap
+version: '1.0.0' # just for humans, typically '1.2+git' or '1.3.2'
+summary: A command-line todolist application # 79 char long summary
+description: |
+  tasks will help you get more done in less time.
+  It's designed to be as simple as possible to help
+  you accomplish your goals.
+
+grade: stable # must be 'stable' to release into candidate/stable channels
+confinement: strict # use 'strict' once you have the right plugs and slots
+
+apps:
+  tasks:
+    command: tasks
+
+parts:
+  tasks:
+    plugin: go
+    source: .
+    go-importpath: tasks
+
+plugs:
+  tasks-home:
+    interface: home
