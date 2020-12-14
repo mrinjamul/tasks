@@ -45,6 +45,10 @@ func addRun(cmd *cobra.Command, args []string) {
 		file := []byte("[]")
 		err = ioutil.WriteFile(todo.DatabaseFile, file, 0644)
 	}
+	if _, err := os.Stat(todo.DatabaseFile); os.IsNotExist(err) {
+		file := []byte("[]")
+		err = ioutil.WriteFile(todo.DatabaseFile, file, 0644)
+	}
 	var todoName string
 	for _, x := range args {
 		todoName += x + " "

@@ -15,7 +15,7 @@ Download for your platform
 For Linux,
 
 ```sh
-wget https://github.com/mrinjamul/tasks/releases/download/v1.0.0/tasks-linux-amd64-current.tar.gz
+wget https://github.com/mrinjamul/tasks/releases/download/v1.0.1/tasks-linux-amd64-v1.0.1.tar.gz
 tar xvf tasks-linux-amd64-current.tar.gz
 chmod +x tasks
 sudo mv tasks /usr/local/bin
@@ -29,7 +29,7 @@ You need to have `wget tar`. To install simply type `pkg install wget tar`
 
 ```sh
 cd ~
-wget https://github.com/mrinjamul/tasks/releases/download/v1.0.0/tasks-linux-arm-current.tar.gz
+wget https://github.com/mrinjamul/tasks/releases/download/v1.0.1/tasks-linux-arm-v1.0.1.tar.gz
 tar xvf tasks-linux-arm-current.tar.gz
 chmod +x tasks
 mv tasks ../usr/bin
