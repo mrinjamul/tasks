@@ -45,6 +45,15 @@ chmod +x tasks
 mv tasks ../usr/bin
 ```
 
+### Building from source
+
+```
+git clone https://github.com/mrinjamul/tasks
+cd tasks
+go build -ldflags "-X 'github.com/mrinjamul/tasks/todo.Version=$(git describe --tags $(git rev-list --tags --max-count=1) || echo "dev")' -X 'github.com/mrinjamul/tasks/todo.GitCommit=$(git rev-parse HEAD)' -s -w"
+go install -ldflags "-X 'github.com/mrinjamul/tasks/todo.Version=$(git describe --tags $(git rev-list --tags --max-count=1) || echo "dev")' -X 'github.com/mrinjamul/tasks/todo.GitCommit=$(git rev-parse HEAD)' -s -w"
+```
+
 ## Usage
 
 ```sh

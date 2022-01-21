@@ -25,3 +25,6 @@ tasks
 /parts
 /prime
 *.snap
+
+# secrets
+.env

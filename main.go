@@ -17,6 +17,13 @@ package main
 
 import "github.com/mrinjamul/tasks/cmd"
 
+var (
+	//
+	Version string
+	//
+	GitCommit string
+)
+
 func main() {
 	cmd.Execute()
 }

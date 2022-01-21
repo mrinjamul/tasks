@@ -33,7 +33,7 @@ var versionCmd = &cobra.Command{
 
 // ◈ versionRun
 func versionRun(cmd *cobra.Command, args []string) {
-	fmt.Println("tasks version " + todo.GetVersion())
+	fmt.Println(todo.Appname + " version " + todo.Version + "-" + todo.GitCommit)
 }
 
 func init() {
