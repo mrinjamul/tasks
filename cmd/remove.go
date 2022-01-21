@@ -21,6 +21,7 @@ import (
 	"sort"
 	"strconv"
 
+	"github.com/charmbracelet/lipgloss"
 	"github.com/mrinjamul/tasks/todo"
 	"github.com/spf13/cobra"
 )
@@ -33,6 +34,19 @@ var removeCmd = &cobra.Command{
 	Long:    `Remove will remove a task from the list by Label(index)`,
 	Run:     removeRun,
 }
+
+var (
+	removeMark = lipgloss.NewStyle().SetString("[-]").
+			Foreground(lipgloss.AdaptiveColor{Light: "#FF5F5F", Dark: "#FF5F5F"}).
+			PaddingRight(1).
+			String()
+
+	removeList = func(s string) string {
+		return removeMark + lipgloss.NewStyle().
+			Foreground(morehigh).
+			Render(s)
+	}
+)
 
 // Main func
 func removeRun(cmd *cobra.Command, args []string) {
@@ -52,7 +66,11 @@ func removeRun(cmd *cobra.Command, args []string) {
 				}
 				if tasks[i].Done {
 					text := tasks[i].Text
-					fmt.Println("- " + "\"" + strconv.Itoa(i) + ". " + text + "\"" + " has been removed")
+					// fmt.Println("- " + "\"" + strconv.Itoa(i) + ". " + text + "\"" + " has been removed")
+					li := lipgloss.JoinHorizontal(lipgloss.Left,
+						removeList("'"+strconv.Itoa(i)+". "+text+"'"+" has been removed"),
+					)
+					fmt.Println(li)
 				}
 			}
 			sort.Sort(todo.ByPri(undoneTasks))
@@ -89,7 +107,11 @@ func removeRun(cmd *cobra.Command, args []string) {
 			if i > 0 && i <= len(tasks) {
 				text := tasks[i-1].Text
 				tasks = todo.RemoveTask(tasks, i-1)
-				fmt.Println("- " + "\"" + strconv.Itoa(i) + ". " + text + "\"" + " has been removed")
+				// fmt.Println("- " + "\"" + strconv.Itoa(i) + ". " + text + "\"" + " has been removed")
+				li := lipgloss.JoinHorizontal(lipgloss.Left,
+					removeList("'"+strconv.Itoa(i)+". "+text+"'"+" has been removed"),
+				)
+				fmt.Println(li)
 				sort.Sort(todo.ByPri(tasks))
 				todo.SaveTasks(todo.DatabaseFile, tasks)
 			} else {

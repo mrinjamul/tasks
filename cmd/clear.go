@@ -33,7 +33,7 @@ var clearCmd = &cobra.Command{
 // Main func
 func clearRun(cmd *cobra.Command, args []string) {
 	tasks := []todo.Task{}
-	if forceOpt == true {
+	if forceOpt {
 		err := todo.SaveTasks(todo.DatabaseFile, tasks)
 		if err != nil {
 			fmt.Printf("%v", err)

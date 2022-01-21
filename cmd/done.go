@@ -22,6 +22,7 @@ import (
 	"sort"
 	"strconv"
 
+	"github.com/charmbracelet/lipgloss"
 	"github.com/mrinjamul/tasks/todo"
 	"github.com/spf13/cobra"
 )
@@ -35,6 +36,20 @@ var doneCmd = &cobra.Command{
 	Run:     doneRun,
 }
 
+var (
+	doneMark = lipgloss.NewStyle().SetString("[✓]").
+			Foreground(special).
+			PaddingRight(1).
+			String()
+
+	doneList = func(s string) string {
+		return doneMark + lipgloss.NewStyle().
+			Strikethrough(true).
+			Foreground(lipgloss.AdaptiveColor{Light: "#969B86", Dark: "#696969"}).
+			Render(s)
+	}
+)
+
 // Main func
 func doneRun(cmd *cobra.Command, args []string) {
 	if len(args) == 0 {
@@ -42,7 +57,7 @@ func doneRun(cmd *cobra.Command, args []string) {
 		fmt.Println("Usage: tasks done [task id]")
 		os.Exit(1)
 	}
-	tasks, err := todo.ReadTasks(todo.DatabaseFile)
+	tasks, _ := todo.ReadTasks(todo.DatabaseFile)
 	i, err := strconv.Atoi(args[0])
 
 	if err != nil {
@@ -51,8 +66,11 @@ func doneRun(cmd *cobra.Command, args []string) {
 	}
 	if i > 0 && i <= len(tasks) {
 		tasks[i-1].Done = true
-		fmt.Printf("%q %v\n", tasks[i-1].Text, "marked done")
-
+		// fmt.Printf("%q %v\n", tasks[i-1].Text, "marked done")
+		li := lipgloss.JoinHorizontal(lipgloss.Left,
+			doneList(tasks[i-1].Text),
+		)
+		fmt.Println(li)
 		sort.Sort(todo.ByPri(tasks))
 		todo.SaveTasks(todo.DatabaseFile, tasks)
 	} else {

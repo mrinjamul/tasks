@@ -49,7 +49,7 @@ func modifyRun(cmd *cobra.Command, args []string) {
 		fmt.Println("Usage: tasks modify [task id] [new]")
 		os.Exit(1)
 	}
-	tasks, err := todo.ReadTasks(todo.DatabaseFile)
+	tasks, _ := todo.ReadTasks(todo.DatabaseFile)
 	i, err := strconv.Atoi(args[0])
 	if err != nil {
 		fmt.Println(args[0], "is not a valid index\ninvalid syntax")

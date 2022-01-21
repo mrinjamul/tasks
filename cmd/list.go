@@ -22,6 +22,7 @@ import (
 	"sort"
 	"text/tabwriter"
 
+	"github.com/charmbracelet/lipgloss"
 	"github.com/mrinjamul/tasks/todo"
 	"github.com/spf13/cobra"
 )
@@ -35,9 +36,47 @@ var listCmd = &cobra.Command{
 	Run:     listRun,
 }
 
+var (
+	// make looks good
+	// width       = 96
+	// columnWidth = 80
+
+	subtle    = lipgloss.AdaptiveColor{Light: "#D9DCCF", Dark: "#383838"}
+	highlight = lipgloss.AdaptiveColor{Light: "#874BFD", Dark: "#7D56F4"}
+	morehigh  = lipgloss.AdaptiveColor{Light: "#FFCB6B", Dark: "#FFCB6B"}
+	special   = lipgloss.AdaptiveColor{Light: "#43BF6D", Dark: "#73F59F"}
+	// List.
+	list = lipgloss.NewStyle().
+		Border(lipgloss.NormalBorder(), false, true, false, false).
+		BorderForeground(subtle).
+		MarginRight(2)
+
+	listHeader = lipgloss.NewStyle().
+			BorderStyle(lipgloss.NormalBorder()).
+			BorderBottom(true).
+			BorderForeground(subtle).
+			MarginRight(2).
+			Render
+
+	listItem          = lipgloss.NewStyle().PaddingLeft(2).Render
+	listItemHighlight = lipgloss.NewStyle().Foreground(highlight).PaddingLeft(2).Render
+	listItemMoreHigh  = lipgloss.NewStyle().Foreground(morehigh).PaddingLeft(2).Render
+
+	checkMark = lipgloss.NewStyle().SetString("✓").
+			Foreground(special).
+			PaddingRight(1).
+			String()
+
+	listDone = func(s string) string {
+		return checkMark + lipgloss.NewStyle().
+			Strikethrough(true).
+			Foreground(lipgloss.AdaptiveColor{Light: "#969B86", Dark: "#696969"}).
+			Render(s)
+	}
+)
+
 // Main func
 func listRun(cmd *cobra.Command, args []string) {
-	// TODO: make looks good
 
 	// Check if database exists or create
 	if _, err := os.Stat(todo.DatabaseFile); os.IsNotExist(err) {
@@ -49,6 +88,9 @@ func listRun(cmd *cobra.Command, args []string) {
 	if err != nil {
 		file := []byte("[]")
 		err = ioutil.WriteFile(todo.DatabaseFile, file, 0644)
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 	if len(tasks) == 0 {
 		fmt.Println("Empty Todo list")
@@ -57,11 +99,24 @@ func listRun(cmd *cobra.Command, args []string) {
 	sort.Sort(todo.ByPri(tasks))
 
 	w := tabwriter.NewWriter(os.Stdout, 3, 0, 1, ' ', 0)
+	vertical := lipgloss.JoinVertical(lipgloss.Left, listHeader("TODO:"))
 	for _, i := range tasks {
 		if allOpt || i.Done == doneOpt {
-			fmt.Fprintln(w, i.Label()+"\t"+i.PrettyDone()+"\t"+i.PrettyP()+"\t"+i.Text+"\t")
+			if i.Done {
+				vertical = lipgloss.JoinVertical(lipgloss.Left, vertical, listDone(i.Label()+i.Text))
+			} else if i.Priority == 1 {
+				vertical = lipgloss.JoinVertical(lipgloss.Left, vertical, listItemMoreHigh(i.Label()+i.Text))
+			} else if i.Priority == 3 {
+				vertical = lipgloss.JoinVertical(lipgloss.Left, vertical, listItem(i.Label()+i.Text))
+			} else {
+				vertical = lipgloss.JoinVertical(lipgloss.Left, vertical, listItemHighlight(i.Label()+i.Text))
+			}
 		}
 	}
+	lists := lipgloss.JoinHorizontal(lipgloss.Top,
+		list.Render(vertical),
+	)
+	fmt.Fprintln(w, lists)
 	w.Flush()
 }
 

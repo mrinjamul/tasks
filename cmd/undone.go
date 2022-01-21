@@ -22,6 +22,7 @@ import (
 	"sort"
 	"strconv"
 
+	"github.com/charmbracelet/lipgloss"
 	"github.com/mrinjamul/tasks/todo"
 	"github.com/spf13/cobra"
 )
@@ -35,6 +36,19 @@ var undoneCmd = &cobra.Command{
 	Run:     undoneRun,
 }
 
+var (
+	undoneMark = lipgloss.NewStyle().SetString("[ ]").
+			Foreground(lipgloss.AdaptiveColor{Light: "#43BF6D", Dark: "#73F59F"}).
+			PaddingRight(1).
+			String()
+
+	undoneList = func(s string) string {
+		return undoneMark + lipgloss.NewStyle().
+			Foreground(morehigh).
+			Render(s)
+	}
+)
+
 // Main func
 func undoneRun(cmd *cobra.Command, args []string) {
 	if len(args) == 0 {
@@ -42,7 +56,7 @@ func undoneRun(cmd *cobra.Command, args []string) {
 		fmt.Println("Usage: tasks undone [task id]")
 		os.Exit(1)
 	}
-	tasks, err := todo.ReadTasks(todo.DatabaseFile)
+	tasks, _ := todo.ReadTasks(todo.DatabaseFile)
 	i, err := strconv.Atoi(args[0])
 
 	if err != nil {
@@ -50,7 +64,11 @@ func undoneRun(cmd *cobra.Command, args []string) {
 	}
 	if i > 0 && i <= len(tasks) {
 		tasks[i-1].Done = false
-		fmt.Printf("%q %v\n", tasks[i-1].Text, "marked undone")
+		// fmt.Printf("%q %v\n", tasks[i-1].Text, "marked undone")
+		li := lipgloss.JoinHorizontal(lipgloss.Left,
+			undoneList(tasks[i-1].Text),
+		)
+		fmt.Println(li)
 
 		sort.Sort(todo.ByPri(tasks))
 		todo.SaveTasks(todo.DatabaseFile, tasks)

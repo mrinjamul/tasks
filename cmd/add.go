@@ -20,6 +20,7 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/charmbracelet/lipgloss"
 	"github.com/mrinjamul/tasks/todo"
 	"github.com/spf13/cobra"
 )
@@ -33,6 +34,18 @@ var addCmd = &cobra.Command{
 	Run:     addRun,
 }
 
+var (
+	addMark = lipgloss.NewStyle().SetString("[+]").
+		Foreground(lipgloss.AdaptiveColor{Light: "#43BF6D", Dark: "#73F59F"}).
+		PaddingRight(1).
+		String()
+	newlist = func(s string) string {
+		return addMark + lipgloss.NewStyle().
+			Foreground(highlight).
+			Render(s)
+	}
+)
+
 // Main func
 func addRun(cmd *cobra.Command, args []string) {
 	if len(args) == 0 {
@@ -44,10 +57,18 @@ func addRun(cmd *cobra.Command, args []string) {
 	if err != nil {
 		file := []byte("[]")
 		err = ioutil.WriteFile(todo.DatabaseFile, file, 0644)
+		if err != nil {
+			fmt.Println("Error: Unable to create database file")
+			os.Exit(1)
+		}
 	}
 	if _, err := os.Stat(todo.DatabaseFile); os.IsNotExist(err) {
 		file := []byte("[]")
 		err = ioutil.WriteFile(todo.DatabaseFile, file, 0644)
+		if err != nil {
+			fmt.Println("Error: Unable to create database file")
+			os.Exit(1)
+		}
 	}
 	var todoName string
 	for _, x := range args {
@@ -57,7 +78,11 @@ func addRun(cmd *cobra.Command, args []string) {
 	task.SetPriority(priority)
 	tasks = append(tasks, task)
 	err = todo.SaveTasks(todo.DatabaseFile, tasks)
-	fmt.Println("[+] New task added")
+	// fmt.Println("[+] New task added")
+	li := lipgloss.JoinHorizontal(lipgloss.Left,
+		newlist("New task added "+todoName),
+	)
+	fmt.Println(li)
 	if err != nil {
 		fmt.Println(err)
 	}
