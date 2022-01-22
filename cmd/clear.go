@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/mrinjamul/tasks/todo"
 	"github.com/spf13/cobra"
@@ -33,6 +34,9 @@ var clearCmd = &cobra.Command{
 // Main func
 func clearRun(cmd *cobra.Command, args []string) {
 	tasks := []todo.Task{}
+	if _, err := os.Stat(todo.DatabaseFile); os.IsNotExist(err) {
+		todo.CreateDatabase()
+	}
 	if forceOpt {
 		err := todo.SaveTasks(todo.DatabaseFile, tasks)
 		if err != nil {

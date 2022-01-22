@@ -36,6 +36,9 @@ var modifyCmd = &cobra.Command{
 
 // Main func
 func modifyRun(cmd *cobra.Command, args []string) {
+	if _, err := os.Stat(todo.DatabaseFile); os.IsNotExist(err) {
+		todo.CreateDatabase()
+	}
 	if len(args) == 0 {
 		fmt.Println("Error: Too short argument")
 		fmt.Println("Usage: tasks modify [task id] [new]")

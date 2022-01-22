@@ -53,6 +53,10 @@ func addRun(cmd *cobra.Command, args []string) {
 		fmt.Println("Usage: tasks add [task]")
 		os.Exit(1)
 	}
+	// if db doesn't exists, create
+	if _, err := os.Stat(todo.DatabaseFile); os.IsNotExist(err) {
+		todo.CreateDatabase()
+	}
 	tasks, err := todo.ReadTasks(todo.DatabaseFile)
 	if err != nil {
 		file := []byte("[]")

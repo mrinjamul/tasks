@@ -47,6 +47,7 @@ func Execute() {
 }
 
 func init() {
+	// todo.MigrateDB()
 	// cobra.OnInitialize(initConfig)
 
 	// Here you will define your flags and configuration settings.

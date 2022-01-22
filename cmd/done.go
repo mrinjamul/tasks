@@ -57,6 +57,9 @@ func doneRun(cmd *cobra.Command, args []string) {
 		fmt.Println("Usage: tasks done [task id]")
 		os.Exit(1)
 	}
+	if _, err := os.Stat(todo.DatabaseFile); os.IsNotExist(err) {
+		todo.CreateDatabase()
+	}
 	tasks, _ := todo.ReadTasks(todo.DatabaseFile)
 	i, err := strconv.Atoi(args[0])
 

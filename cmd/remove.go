@@ -50,6 +50,9 @@ var (
 
 // Main func
 func removeRun(cmd *cobra.Command, args []string) {
+	if _, err := os.Stat(todo.DatabaseFile); os.IsNotExist(err) {
+		todo.CreateDatabase()
+	}
 	// remove only done tasks func
 	if doOpt {
 		response := todo.ConfirmPrompt("Do you want to remove all done task(s)?")

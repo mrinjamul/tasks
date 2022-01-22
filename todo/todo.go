@@ -15,17 +15,17 @@ import (
 
 // Task : structure
 type Task struct {
-	Text     string
-	Priority int
-	position int
-	Done     bool
+	Text     string `json:"text"`
+	Priority int    `json:"prority"`
+	Position int    `json:"position"`
+	Done     bool   `json:"done"`
 }
 
 // DatabaseFile is the db file
 var DatabaseFile string = GetHomeDir() + "/.config/tasks/tasks.json"
 var (
 	Appname   = "tasks"
-	Version   = "1.0.0"
+	Version   = "dev"
 	GitCommit = "0000000000000000000000000000000000000000"
 )
 
@@ -79,7 +79,7 @@ func ReadTasks(filename string) ([]Task, error) {
 		return []Task{}, err
 	}
 	for i := range tasks {
-		tasks[i].position = i + 1
+		tasks[i].Position = i + 1
 	}
 	return tasks, nil
 }
@@ -110,7 +110,7 @@ func (i *Task) PrettyP() string {
 
 // Label : index lists
 func (i *Task) Label() string {
-	return strconv.Itoa(i.position) + "."
+	return strconv.Itoa(i.Position) + "."
 }
 
 // ByPri implements sort.Interface for []Item base on
@@ -127,7 +127,7 @@ func (s ByPri) Less(i, j int) bool {
 	if s[i].Priority != s[j].Priority {
 		return s[i].Priority < s[j].Priority
 	}
-	return s[i].position < s[j].position
+	return s[i].Position < s[j].Position
 }
 
 // PrettyDone : prettify
@@ -180,4 +180,33 @@ func RemoveDuplicate(slice []int) []int {
 		}
 	}
 	return list
+}
+
+func MigrateDB() {
+	type TaskOld struct {
+		Text     string
+		Priority int
+		position int
+		Done     bool
+	}
+	// old db retrieve
+	var old []TaskOld
+	b, _ := ioutil.ReadFile(DatabaseFile)
+	_ = json.Unmarshal(b, &old)
+	for i := range old {
+		old[i].position = i + 1
+	}
+	// new db restoration
+	var new []Task
+	for _, t := range old {
+		var tasks Task
+		tasks.Text = t.Text
+		tasks.Priority = t.Priority
+		tasks.Position = t.position
+		tasks.Done = t.Done
+		new = append(new, tasks)
+	}
+	b, _ = json.Marshal(new)
+	_ = ioutil.WriteFile(DatabaseFile, b, 0644)
+
 }
